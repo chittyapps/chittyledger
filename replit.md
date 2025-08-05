@@ -76,3 +76,10 @@ Color scheme: Dark themes with emerald green accents (inspired by ChittyTrust re
 - **Inspiration**: ChittyTrust reference design with dark slate theme and emerald accents
 - **User Feedback**: "ohh noice" - positive reception of simplified, sophisticated approach
 - **Impact**: Improved usability and professional appearance while maintaining legal-tech credibility
+
+### Core Concept Clarification
+- **Date**: January 5, 2025
+- **Change**: Corrected fundamental messaging about ChittyChain's role
+- **User Feedback**: "Chitty chain doesn't measure, chitty chain is the ledger"
+- **Implementation**: Updated hero section and messaging to emphasize ChittyChain as the immutable evidence ledger rather than a measurement system
+- **Impact**: Clarified that ChittyChain IS the ledger that records evidence, not a system that measures evidence

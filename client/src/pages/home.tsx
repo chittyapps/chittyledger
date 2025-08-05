@@ -1,4 +1,5 @@
 import HeroSection from "@/components/hero-section";
+import TechStack from "@/components/tech-stack";
 import { Scale } from "lucide-react";
 
 export default function Home() {
@@ -33,6 +34,10 @@ export default function Home() {
               </div>
               
               <div className="col-span-6">
+                <div className="mb-8">
+                  <TechStack />
+                </div>
+                
                 <div className="grid grid-cols-3 gap-8">
                   <div>
                     <h4 className="font-legal text-lg text-obsidian-100 mb-6">Platform</h4>

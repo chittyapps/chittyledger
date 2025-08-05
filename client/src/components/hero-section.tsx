@@ -58,8 +58,8 @@ export default function HeroSection() {
               </h1>
               
               <p className="text-xl text-slate-300 leading-relaxed max-w-lg">
-                Beyond credit scores. Beyond binary trust. ChittyChain measures what 
-                matters: Source, Time, Chain, Outcomes, Network, and Justice.
+                Beyond credit scores. Beyond binary trust. ChittyChain is the immutable 
+                ledger that records Source, Time, Chain, Outcomes, Network, and Justice.
               </p>
             </div>
 
@@ -99,7 +99,7 @@ export default function HeroSection() {
                 <div className="bg-slate-700/50 rounded-lg p-4">
                   <div className="text-sm text-slate-400 mb-2">Case ID: CHT-2024-001</div>
                   <div className="text-white font-medium">Contract Evidence Package</div>
-                  <div className="text-slate-300 text-sm mt-1">Blockchain verified with 6D trust metrics</div>
+                  <div className="text-slate-300 text-sm mt-1">Immutably recorded in ChittyChain ledger</div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4 text-center">
@@ -124,9 +124,9 @@ export default function HeroSection() {
         {/* Bottom Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 max-w-6xl mx-auto">
           {[
-            { icon: Shield, title: "Source Verification", desc: "Cryptographic validation of evidence origins" },
-            { icon: Scale, title: "Justice Metrics", desc: "Fair and transparent legal proceedings" },
-            { icon: Database, title: "Network Trust", desc: "Distributed consensus and verification" }
+            { icon: Shield, title: "Immutable Recording", desc: "Evidence permanently recorded with cryptographic integrity" },
+            { icon: Scale, title: "Legal Ledger", desc: "Court-admissible chain of custody tracking" },
+            { icon: Database, title: "Evidence Repository", desc: "Centralized ledger for all case evidence" }
           ].map((feature, i) => {
             const Icon = feature.icon;
             return (
