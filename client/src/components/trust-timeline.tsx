@@ -31,9 +31,9 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
   return (
     <div className="bg-institutional-50 rounded-xl p-6 shadow-sm border border-institutional-200" data-testid="trust-timeline">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="font-legal text-lg text-institutional-900">Evidence Timeline</h3>
+        <h3 className="font-legal text-lg text-institutional-900">ChittyChain Evidence</h3>
         <Badge className={evidence.status === 'MINTED' ? 'bg-legal-gold-100 text-legal-gold-800' : 'bg-forensic-red-100 text-forensic-red-800'}>
-          {evidence.status === 'MINTED' ? 'PRESERVED' : 'DEGRADING'}
+          {evidence.status === 'MINTED' ? 'IN LEDGER' : 'DEGRADING'}
         </Badge>
       </div>
 
@@ -124,9 +124,9 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
         <div className="flex items-start space-x-3">
           <AlertTriangle className="w-5 h-5 text-legal-gold-600 mt-0.5" />
           <div className="text-sm text-legal-gold-800">
-            <strong>Key Insight:</strong> Verification captures evidence state at a specific moment in time. 
-            Without preservation on ChittyChain, this evidence can degrade as circumstances change. 
-            ChittyChain permanence locks the evidence score at the verification moment.
+            <strong>ChittyChain:</strong> The immutable evidence ledger that records qualified evidence permanently. 
+            Evidence that doesn't meet ledger standards continues to degrade over time. 
+            ChittyChain entries lock evidence state at the moment of qualification.
           </div>
         </div>
       </div>
