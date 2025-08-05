@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Navigation from "@/components/navigation";
 import Home from "@/pages/home";
 import EvidenceManagement from "@/pages/evidence-management";
+import NotionSync from "@/pages/notion-sync";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -13,6 +14,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/evidence" component={EvidenceManagement} />
+      <Route path="/notion" component={NotionSync} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -22,9 +24,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="bg-institutional-950 text-institutional-50 font-sans overflow-x-hidden min-h-screen">
+        <div className="bg-obsidian-complex text-obsidian-50 font-sans overflow-x-hidden min-h-screen">
           <Navigation />
-          <main className="ml-20">
+          <main className="ml-24">
             <Router />
           </main>
           <Toaster />

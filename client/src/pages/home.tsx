@@ -1,60 +1,66 @@
 import HeroSection from "@/components/hero-section";
+import { Scale } from "lucide-react";
 
 export default function Home() {
   return (
     <div>
       <HeroSection />
       
-      {/* Footer */}
-      <footer className="py-16 bg-institutional-950 border-t border-institutional-800">
+      {/* Elite Footer */}
+      <footer className="py-20 bg-obsidian-complex border-t border-gold-byzantium-500/20">
         <div className="container mx-auto px-8">
-          <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-6">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="legal-seal w-10 h-10 rounded-full flex items-center justify-center">
-                  <i className="fas fa-balance-scale text-institutional-950 text-lg"></i>
+          <div className="glass-obsidian rounded-2xl p-12">
+            <div className="grid grid-cols-12 gap-12">
+              <div className="col-span-6">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="legal-seal-premium w-12 h-12 rounded-full flex items-center justify-center">
+                    <Scale className="w-6 h-6 text-obsidian-950" />
+                  </div>
+                  <div>
+                    <div className="font-legal text-2xl text-gradient-byzantium">ChittyChain</div>
+                    <div className="font-tech text-sm text-gold-byzantium-500">Evidence Ledger</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-legal text-xl text-institutional-50">ChittyChain</div>
-                  <div className="font-tech text-xs text-legal-gold-500">Evidence Ledger</div>
+                
+                <p className="text-obsidian-300 max-w-md font-crimson leading-relaxed mb-8">
+                  Revolutionary blockchain-based evidence management with cryptographic validation, 
+                  ensuring court-admissible documentation and immutable chain of custody.
+                </p>
+                
+                <div className="glass-byzantium rounded-xl p-4 inline-block">
+                  <span className="text-sm text-obsidian-950 font-tech tracking-wide">© 2024 ChittyOS Legal Technology Suite</span>
                 </div>
               </div>
               
-              <p className="text-institutional-400 max-w-md">
-                Immutable forensic evidence management with blockchain verification, 
-                ensuring court-admissible documentation and complete chain of custody.
-              </p>
-              
-              <div className="mt-6">
-                <span className="text-xs text-institutional-600 font-tech">© 2024 ChittyOS Legal Technology Suite</span>
-              </div>
-            </div>
-            
-            <div className="col-span-6">
-              <div className="grid grid-cols-3 gap-8">
-                <div>
-                  <h4 className="font-semibold text-institutional-300 mb-4">Platform</h4>
-                  <ul className="space-y-2 text-sm text-institutional-500">
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">Evidence Upload</a></li>
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">Chain Verification</a></li>
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">Contradiction Detection</a></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-institutional-300 mb-4">Legal</h4>
-                  <ul className="space-y-2 text-sm text-institutional-500">
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">Court Admissibility</a></li>
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">Privacy Policy</a></li>
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">Terms of Service</a></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-institutional-300 mb-4">Support</h4>
-                  <ul className="space-y-2 text-sm text-institutional-500">
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">Documentation</a></li>
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">API Reference</a></li>
-                    <li><a href="#" className="hover:text-legal-gold-500 transition-colors">Contact</a></li>
-                  </ul>
+              <div className="col-span-6">
+                <div className="grid grid-cols-3 gap-8">
+                  <div>
+                    <h4 className="font-legal text-lg text-obsidian-100 mb-6">Platform</h4>
+                    <ul className="space-y-3 text-sm text-obsidian-400">
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Evidence Upload</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Chain Verification</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Contradiction Detection</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Notion Integration</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-legal text-lg text-obsidian-100 mb-6">Legal</h4>
+                    <ul className="space-y-3 text-sm text-obsidian-400">
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Court Admissibility</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Privacy Policy</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Terms of Service</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Compliance</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-legal text-lg text-obsidian-100 mb-6">Support</h4>
+                    <ul className="space-y-3 text-sm text-obsidian-400">
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Documentation</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">API Reference</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Contact</a></li>
+                      <li><a href="#" className="hover:text-gold-byzantium-500 transition-colors font-crimson">Status</a></li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
