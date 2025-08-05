@@ -28,7 +28,7 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-legal text-lg text-institutional-900 flex items-center">
           <Shield className="w-5 h-5 mr-2 text-legal-gold-600" />
-          Minting Eligibility
+          Blockchain Permanence
         </h3>
         <Badge className={isEligible ? 'bg-legal-gold-100 text-legal-gold-800' : 'bg-forensic-red-100 text-forensic-red-800'}>
           {isEligible ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
@@ -38,7 +38,7 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
       {/* Score Bar */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-institutional-600">Minting Score</span>
+          <span className="text-sm text-institutional-600">Permanence Score</span>
           <span className="font-tech text-lg font-bold text-legal-gold-600">
             {scorePercent.toFixed(0)}%
           </span>
@@ -54,14 +54,14 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
           />
         </div>
         <div className="text-xs text-institutional-500 mt-1">
-          Minimum 70% required for minting
+          Minimum 70% required for blockchain preservation
         </div>
       </div>
 
       {/* 6D Trust Framework */}
       <div className="space-y-4 mb-6">
         <h4 className="font-medium text-institutional-700 text-sm uppercase tracking-wide">
-          6D Trust Revolution - Path to Chain
+          6D Evaluation - Path to Chain
         </h4>
         
         {eligibility.sixDScores && (
@@ -140,12 +140,12 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
             data-testid="button-mint-evidence"
           >
             <Shield className="w-4 h-4 mr-2" />
-            Mint to Blockchain
+            Preserve on ChittyChain
           </Button>
         ) : (
           <div className="text-center">
             <p className="text-sm text-institutional-600 mb-2">
-              Evidence must meet minimum requirements before minting
+              Evidence must meet minimum requirements for permanent preservation
             </p>
             <Button 
               variant="outline"
@@ -163,8 +163,8 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
         <div className="flex items-start space-x-3">
           <TrendingUp className="w-5 h-5 text-legal-gold-600 mt-0.5" />
           <div className="text-sm text-legal-gold-800">
-            <strong>6D Path to Chain:</strong> Evidence must score 70%+ across all six trust dimensions 
-            (Source, Time, Chain, Network, Outcomes, Justice) to qualify for permanent blockchain preservation.
+            <strong>6D Path to Chain:</strong> Evidence must score 70%+ across all six dimensions 
+            (Source, Time, Chain, Network, Outcomes, Justice) to qualify for permanent ChittyChain preservation.
           </div>
         </div>
       </div>

@@ -31,16 +31,16 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
   return (
     <div className="bg-institutional-50 rounded-xl p-6 shadow-sm border border-institutional-200" data-testid="trust-timeline">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="font-legal text-lg text-institutional-900">Trust Timeline</h3>
+        <h3 className="font-legal text-lg text-institutional-900">Evidence Timeline</h3>
         <Badge className={evidence.status === 'MINTED' ? 'bg-legal-gold-100 text-legal-gold-800' : 'bg-forensic-red-100 text-forensic-red-800'}>
-          {evidence.status === 'MINTED' ? 'TRUST LOCKED' : 'DEGRADING'}
+          {evidence.status === 'MINTED' ? 'PRESERVED' : 'DEGRADING'}
         </Badge>
       </div>
 
       {/* Trust Score Visualization */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-institutional-600">Trust Score</span>
+          <span className="text-sm text-institutional-600">Evidence Score</span>
           <span className="font-tech text-lg font-bold text-legal-gold-600">
             {evidence.trustScore} / {evidence.originalTrustScore}
           </span>
@@ -83,7 +83,7 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
               <div className="text-xs text-institutional-600">{verifyHours}h ago</div>
             </div>
             <div className="text-xs text-forensic-red-600">
-              {evidence.status !== 'MINTED' ? '⚠️ Trust can degrade' : '✓ Trust locked'}
+              {evidence.status !== 'MINTED' ? '⚠️ Can degrade' : '✓ Preserved'}
             </div>
           </div>
         )}
@@ -95,10 +95,10 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
               <Lock className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-institutional-900">Evidence Minted</div>
+              <div className="text-sm font-medium text-institutional-900">Evidence Preserved</div>
               <div className="text-xs text-institutional-600">{mintHours}h ago</div>
             </div>
-            <div className="text-xs text-legal-gold-600">🔒 Trust permanently locked</div>
+            <div className="text-xs text-legal-gold-600">🔒 Permanently preserved</div>
           </div>
         ) : (
           <div className="flex items-center space-x-4 opacity-50">
@@ -106,8 +106,8 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
               <AlertTriangle className="w-4 h-4 text-institutional-500" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-institutional-500">Not Minted</div>
-              <div className="text-xs text-institutional-400">Trust can continue to degrade</div>
+              <div className="text-sm font-medium text-institutional-500">Not Preserved</div>
+              <div className="text-xs text-institutional-400">Evidence can continue to degrade</div>
             </div>
             <button 
               className="text-xs bg-institutional-300 text-institutional-600 px-3 py-1 rounded-full cursor-not-allowed"
@@ -124,9 +124,9 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
         <div className="flex items-start space-x-3">
           <AlertTriangle className="w-5 h-5 text-legal-gold-600 mt-0.5" />
           <div className="text-sm text-legal-gold-800">
-            <strong>Key Insight:</strong> Verification captures truth at a specific moment in time. 
-            Without minting to blockchain, this trust can degrade as circumstances can change. 
-            Minting permanently locks the trust score at the verification moment.
+            <strong>Key Insight:</strong> Verification captures evidence state at a specific moment in time. 
+            Without preservation on ChittyChain, this evidence can degrade as circumstances change. 
+            ChittyChain permanence locks the evidence score at the verification moment.
           </div>
         </div>
       </div>
