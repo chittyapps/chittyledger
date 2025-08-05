@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { dashboardApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Scale, FileText, Database, CheckCircle, Activity } from "lucide-react";
+import { Shield, Scale, FileText, Database, CheckCircle, Activity, MapPin, Clock, Link, Target, Network, Gavel } from "lucide-react";
 
 export default function HeroSection() {
   const { data: stats, isLoading } = useQuery({
@@ -19,12 +19,12 @@ export default function HeroSection() {
   }
 
   const trustMetrics = [
-    { label: "S", value: "Source", color: "text-emerald-400" },
-    { label: "T", value: "Time", color: "text-blue-400" },
-    { label: "C", value: "Chain", color: "text-cyan-400" },
-    { label: "O", value: "Outcomes", color: "text-purple-400" },
-    { label: "N", value: "Network", color: "text-yellow-400" },
-    { label: "J", value: "Justice", color: "text-red-400" }
+    { icon: MapPin, value: "Source", color: "text-emerald-400" },
+    { icon: Clock, value: "Time", color: "text-blue-400" },
+    { icon: Link, value: "Chain", color: "text-cyan-400" },
+    { icon: Target, value: "Outcomes", color: "text-purple-400" },
+    { icon: Network, value: "Network", color: "text-yellow-400" },
+    { icon: Gavel, value: "Justice", color: "text-red-400" }
   ];
 
   return (
@@ -65,14 +65,17 @@ export default function HeroSection() {
 
             {/* Trust Metrics */}
             <div className="flex items-center space-x-4">
-              {trustMetrics.map((metric, i) => (
-                <div key={i} className="flex flex-col items-center">
-                  <div className={`w-12 h-12 rounded-lg border-2 border-slate-600 bg-slate-800 flex items-center justify-center text-xl font-bold ${metric.color}`}>
-                    {metric.label}
+              {trustMetrics.map((metric, i) => {
+                const Icon = metric.icon;
+                return (
+                  <div key={i} className="flex flex-col items-center">
+                    <div className={`w-12 h-12 rounded-lg border-2 border-slate-600 bg-slate-800 flex items-center justify-center ${metric.color}`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs text-slate-400 mt-1">{metric.value}</span>
                   </div>
-                  <span className="text-xs text-slate-400 mt-1">{metric.value}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold inline-flex items-center">
