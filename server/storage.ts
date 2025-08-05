@@ -473,7 +473,7 @@ export class MemStorage implements IStorage {
       performedBy: evidence.uploadedBy,
       timestamp: new Date(),
       location: "Legal Platform",
-      notes: "Evidence verified - trust degradation begins",
+      notes: "Evidence verified - trust can begin degrading",
       hashBefore: evidence.hashValue,
       hashAfter: evidence.hashValue,
     });

@@ -10,7 +10,7 @@ export default function EvidenceManagement() {
     queryKey: ['/api/evidence']
   });
 
-  const sampleEvidence = evidence?.[0];
+  const sampleEvidence = evidence && evidence.length > 0 ? evidence[0] : null;
 
   return (
     <section className="py-24 bg-institutional-900/30 min-h-screen">

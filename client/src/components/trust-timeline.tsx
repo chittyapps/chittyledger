@@ -83,7 +83,7 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
               <div className="text-xs text-institutional-600">{verifyHours}h ago</div>
             </div>
             <div className="text-xs text-forensic-red-600">
-              {evidence.status !== 'MINTED' ? '⚠️ Trust degrading' : '✓ Trust locked'}
+              {evidence.status !== 'MINTED' ? '⚠️ Trust can degrade' : '✓ Trust locked'}
             </div>
           </div>
         )}
@@ -107,7 +107,7 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium text-institutional-500">Not Minted</div>
-              <div className="text-xs text-institutional-400">Trust continues to degrade</div>
+              <div className="text-xs text-institutional-400">Trust can continue to degrade</div>
             </div>
             <button className="text-xs bg-legal-gold-500 text-white px-3 py-1 rounded-full hover:bg-legal-gold-600">
               Mint Now
@@ -122,7 +122,7 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
           <AlertTriangle className="w-5 h-5 text-legal-gold-600 mt-0.5" />
           <div className="text-sm text-legal-gold-800">
             <strong>Key Insight:</strong> Verification captures truth at a specific moment in time. 
-            Without minting to blockchain, this trust degrades as circumstances can change. 
+            Without minting to blockchain, this trust can degrade as circumstances can change. 
             Minting permanently locks the trust score at the verification moment.
           </div>
         </div>
