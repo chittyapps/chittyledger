@@ -40,7 +40,7 @@ export default function HeroSection() {
 
       <div className="absolute top-6 right-8">
         <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 px-4 py-1">
-          CONJST Trust Framework
+          6D Evidence Revolution
         </Badge>
       </div>
 
@@ -96,7 +96,7 @@ export default function HeroSection() {
                 <div className="bg-slate-700/50 rounded-lg p-4">
                   <div className="text-sm text-slate-400 mb-2">Case ID: CHT-2024-001</div>
                   <div className="text-white font-medium">Contract Evidence Package</div>
-                  <div className="text-slate-300 text-sm mt-1">Blockchain verified with CONJST trust framework</div>
+                  <div className="text-slate-300 text-sm mt-1">Blockchain verified with 6D trust metrics</div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4 text-center">
