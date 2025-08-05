@@ -7,16 +7,18 @@ ChittyChain Evidence Ledger is a comprehensive legal evidence management system 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Design preference: Clean, sophisticated interfaces without excessive tactical elements. Prefers restrained professional design over complex animations and effects.
+Color scheme: Dark themes with emerald green accents (inspired by ChittyTrust reference design).
 
 ## System Architecture
 
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript using Vite for build tooling
 - **UI Components**: Shadcn/ui component library with Radix UI primitives
-- **Styling**: Tailwind CSS with custom legal design system (institutional colors, legal-gold accents)
+- **Styling**: Tailwind CSS with clean dark theme (slate backgrounds, emerald accents)
 - **State Management**: TanStack Query for server state and data fetching
 - **Routing**: Wouter for lightweight client-side routing
-- **Design Philosophy**: Professional legal interface with evidence cards, data grids, and forensic-themed components
+- **Design Philosophy**: Clean, sophisticated legal-tech interface inspired by ChittyTrust design - professional and restrained without excessive tactical elements
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js server
@@ -64,3 +66,13 @@ Preferred communication style: Simple, everyday language.
 - **ChittyOS Ecosystem**: Integration points for broader legal technology suite
 - **MCP (Model Context Protocol)**: AI integration framework for evidence analysis
 - **Blockchain Components**: Evidence minting and verification system with proof-of-work
+- **6D Trust Revolution**: Implements Source, Time, Chain, Outcomes, Network, and Justice metrics for comprehensive evidence evaluation
+
+## Recent Changes (January 2025)
+
+### Design System Transformation
+- **Date**: January 5, 2025
+- **Change**: Complete design overhaul from complex tactical elements to clean, professional aesthetic
+- **Inspiration**: ChittyTrust reference design with dark slate theme and emerald accents
+- **User Feedback**: "ohh noice" - positive reception of simplified, sophisticated approach
+- **Impact**: Improved usability and professional appearance while maintaining legal-tech credibility
