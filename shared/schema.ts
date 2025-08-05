@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, decimal, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, decimal, boolean, jsonb, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -82,6 +82,10 @@ export const masterEvidence = pgTable("master_evidence", {
   mintedAt: timestamp("minted_at"),
   trustDegradationRate: decimal("trust_degradation_rate", { precision: 5, scale: 4 }).default("0.0001"),
   lastTrustUpdate: timestamp("last_trust_update").defaultNow().notNull(),
+  corroborationCount: integer("corroboration_count").default(0),
+  conflictCount: integer("conflict_count").default(0),
+  mintingEligible: boolean("minting_eligible").default(false),
+  mintingScore: decimal("minting_score", { precision: 3, scale: 2 }).default("0.00"),
   caseId: varchar("case_id").references(() => cases.id),
   uploadedBy: varchar("uploaded_by").references(() => users.id),
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),

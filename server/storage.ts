@@ -118,6 +118,10 @@ export class MemStorage implements IStorage {
       mintedAt: new Date("2024-01-15T11:47:00Z"),
       trustDegradationRate: "0.0000",
       lastTrustUpdate: new Date("2024-01-15T11:47:00Z"),
+      corroborationCount: 3,
+      conflictCount: 0,
+      mintingEligible: true,
+      mintingScore: "0.85",
       caseId: case1.id,
       uploadedBy: attorney1.id,
       uploadedAt: new Date("2024-01-15T09:32:00Z"),
@@ -140,6 +144,10 @@ export class MemStorage implements IStorage {
       mintedAt: null,
       trustDegradationRate: "0.0001",
       lastTrustUpdate: new Date("2024-01-15T10:15:00Z"),
+      corroborationCount: 1,
+      conflictCount: 0,
+      mintingEligible: false,
+      mintingScore: "0.45",
       caseId: case1.id,
       uploadedBy: attorney1.id,
       uploadedAt: new Date("2024-01-15T10:15:00Z"),
@@ -162,6 +170,10 @@ export class MemStorage implements IStorage {
       mintedAt: null,
       trustDegradationRate: "0.0002",
       lastTrustUpdate: new Date("2024-01-15T16:22:00Z"),
+      corroborationCount: 0,
+      conflictCount: 1,
+      mintingEligible: false,
+      mintingScore: "0.15",
       caseId: case1.id,
       uploadedBy: attorney1.id,
       uploadedAt: new Date("2024-01-15T16:22:00Z"),
@@ -318,6 +330,10 @@ export class MemStorage implements IStorage {
       mintedAt: null,
       trustDegradationRate: "0.0001", // Default degradation rate
       lastTrustUpdate: new Date(),
+      corroborationCount: 0,
+      conflictCount: 0,
+      mintingEligible: false,
+      mintingScore: "0.00",
       uploadedBy: evidenceData.caseId || null, // TODO: get from auth context
       uploadedAt: new Date(),
       verifiedAt: null,
@@ -332,6 +348,110 @@ export class MemStorage implements IStorage {
     
     const updatedEvidence = { ...evidence, ...updates };
     this.evidence.set(id, updatedEvidence);
+    return updatedEvidence;
+  }
+
+  // Calculate minting eligibility based on multiple criteria
+  async calculateMintingEligibility(evidenceId: string): Promise<{ eligible: boolean; score: string; reasons: string[] }> {
+    const evidence = this.evidence.get(evidenceId);
+    if (!evidence) return { eligible: false, score: "0.00", reasons: ["Evidence not found"] };
+
+    const reasons: string[] = [];
+    let score = 0;
+
+    // Base trust score requirement (min 0.60)
+    const currentTrust = parseFloat(await this.calculateCurrentTrustScore(evidenceId));
+    if (currentTrust >= 0.80) {
+      score += 30;
+      reasons.push("✓ High trust score (0.80+)");
+    } else if (currentTrust >= 0.60) {
+      score += 20;
+      reasons.push("✓ Adequate trust score (0.60+)");
+    } else {
+      reasons.push("✗ Trust score too low (<0.60)");
+    }
+
+    // Evidence tier requirement
+    const tierScores: Record<string, number> = {
+      'SELF_AUTHENTICATING': 25,
+      'GOVERNMENT': 25,
+      'FINANCIAL_INSTITUTION': 20,
+      'INDEPENDENT_THIRD_PARTY': 15,
+      'BUSINESS_RECORDS': 10,
+      'FIRST_PARTY_ADVERSE': 5,
+      'FIRST_PARTY_FRIENDLY': 0,
+      'UNCORROBORATED_PERSON': 0
+    };
+    
+    const tierScore = tierScores[evidence.evidenceTier] || 0;
+    score += tierScore;
+    if (tierScore > 0) {
+      reasons.push(`✓ Evidence tier: ${evidence.evidenceTier}`);
+    } else {
+      reasons.push(`✗ Evidence tier too low: ${evidence.evidenceTier}`);
+    }
+
+    // Verification requirement
+    if (evidence.status === 'VERIFIED' || evidence.status === 'MINTED') {
+      score += 15;
+      reasons.push("✓ Evidence verified");
+    } else {
+      reasons.push("✗ Evidence not verified");
+    }
+
+    // Corroboration bonus
+    if (evidence.corroborationCount >= 3) {
+      score += 15;
+      reasons.push(`✓ Strong corroboration (${evidence.corroborationCount} sources)`);
+    } else if (evidence.corroborationCount >= 1) {
+      score += 10;
+      reasons.push(`✓ Some corroboration (${evidence.corroborationCount} sources)`);
+    } else {
+      reasons.push("✗ No corroboration");
+    }
+
+    // Conflict penalty
+    if (evidence.conflictCount > 0) {
+      score -= evidence.conflictCount * 10;
+      reasons.push(`✗ Conflicts detected (${evidence.conflictCount})`);
+    } else {
+      score += 10;
+      reasons.push("✓ No conflicts");
+    }
+
+    // Age penalty (older evidence is harder to mint)
+    const ageHours = (new Date().getTime() - evidence.uploadedAt.getTime()) / (1000 * 60 * 60);
+    if (ageHours < 24) {
+      score += 5;
+      reasons.push("✓ Recent evidence (<24h)");
+    } else if (ageHours > 168) { // 1 week
+      score -= 10;
+      reasons.push("✗ Evidence is old (>1 week)");
+    }
+
+    const finalScore = Math.max(0, Math.min(100, score)) / 100;
+    const eligible = finalScore >= 0.70; // Need 70% score to mint
+
+    return {
+      eligible,
+      score: finalScore.toFixed(2),
+      reasons
+    };
+  }
+
+  // Update minting eligibility for evidence
+  async updateMintingEligibility(evidenceId: string): Promise<Evidence | undefined> {
+    const eligibility = await this.calculateMintingEligibility(evidenceId);
+    const evidence = this.evidence.get(evidenceId);
+    if (!evidence) return undefined;
+
+    const updatedEvidence = {
+      ...evidence,
+      mintingEligible: eligibility.eligible,
+      mintingScore: eligibility.score,
+    };
+
+    this.evidence.set(evidenceId, updatedEvidence);
     return updatedEvidence;
   }
 
@@ -433,6 +553,8 @@ export class MemStorage implements IStorage {
       trustScore: currentTrust, // Lock trust at minting moment
       trustDegradationRate: "0.0000", // No more degradation after minting
       lastTrustUpdate: new Date(),
+      mintingEligible: true, // Already eligible if we're minting
+      mintingScore: "1.00", // Perfect score when minted
     };
     
     this.evidence.set(evidenceId, updatedEvidence);

@@ -3,6 +3,7 @@ import { Filter, Plus } from "lucide-react";
 import EvidenceTable from "@/components/evidence-table";
 import CaseSidebar from "@/components/case-sidebar";
 import TrustTimeline from "@/components/trust-timeline";
+import MintingEligibility from "@/components/minting-eligibility";
 import { useQuery } from "@tanstack/react-query";
 
 export default function EvidenceManagement() {
@@ -10,7 +11,7 @@ export default function EvidenceManagement() {
     queryKey: ['/api/evidence']
   });
 
-  const sampleEvidence = evidence && evidence.length > 0 ? evidence[0] : null;
+  const sampleEvidence = evidence && Array.isArray(evidence) && evidence.length > 0 ? evidence[0] : null;
 
   return (
     <section className="py-24 bg-institutional-900/30 min-h-screen">
@@ -47,7 +48,10 @@ export default function EvidenceManagement() {
           {/* Trust Timeline Demo */}
           {sampleEvidence && (
             <div className="col-span-12 mb-8">
-              <TrustTimeline evidence={sampleEvidence} />
+              <div className="grid grid-cols-2 gap-8">
+                <TrustTimeline evidence={sampleEvidence} />
+                <MintingEligibility evidenceId={sampleEvidence.id} />
+              </div>
             </div>
           )}
 

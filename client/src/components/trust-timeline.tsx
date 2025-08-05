@@ -109,8 +109,11 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
               <div className="text-sm font-medium text-institutional-500">Not Minted</div>
               <div className="text-xs text-institutional-400">Trust can continue to degrade</div>
             </div>
-            <button className="text-xs bg-legal-gold-500 text-white px-3 py-1 rounded-full hover:bg-legal-gold-600">
-              Mint Now
+            <button 
+              className="text-xs bg-institutional-300 text-institutional-600 px-3 py-1 rounded-full cursor-not-allowed"
+              disabled
+            >
+              Not Eligible
             </button>
           </div>
         )}

@@ -141,13 +141,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mint evidence - locks trust score permanently
+  // Check minting eligibility
+  app.get("/api/evidence/:id/minting-eligibility", async (req, res) => {
+    try {
+      const eligibility = await storage.calculateMintingEligibility(req.params.id);
+      res.json(eligibility);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check minting eligibility" });
+    }
+  });
+
+  // Mint evidence - locks trust score permanently (only if eligible)
   app.post("/api/evidence/:id/mint", async (req, res) => {
     try {
       const { blockNumber, hashValue } = req.body;
       
       if (!blockNumber || !hashValue) {
         return res.status(400).json({ error: "Block number and hash value are required" });
+      }
+
+      // Check eligibility first
+      const eligibility = await storage.calculateMintingEligibility(req.params.id);
+      if (!eligibility.eligible) {
+        return res.status(400).json({ 
+          error: "Evidence not eligible for minting", 
+          eligibility: eligibility 
+        });
       }
       
       const mintedEvidence = await storage.mintEvidence(req.params.id, blockNumber, hashValue);
