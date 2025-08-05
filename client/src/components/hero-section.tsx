@@ -19,12 +19,12 @@ export default function HeroSection() {
   }
 
   const trustMetrics = [
-    { label: "S", value: "Source", color: "text-emerald-400" },
-    { label: "T", value: "Time", color: "text-blue-400" },
     { label: "C", value: "Chain", color: "text-cyan-400" },
     { label: "O", value: "Outcomes", color: "text-purple-400" },
     { label: "N", value: "Network", color: "text-yellow-400" },
-    { label: "J", value: "Justice", color: "text-red-400" }
+    { label: "J", value: "Justice", color: "text-red-400" },
+    { label: "S", value: "Source", color: "text-emerald-400" },
+    { label: "T", value: "Time", color: "text-blue-400" }
   ];
 
   return (
@@ -40,7 +40,7 @@ export default function HeroSection() {
 
       <div className="absolute top-6 right-8">
         <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 px-4 py-1">
-          STCONJ Trust Framework
+          CONJST Trust Framework
         </Badge>
       </div>
 
@@ -59,8 +59,8 @@ export default function HeroSection() {
               
               <p className="text-xl text-slate-300 leading-relaxed max-w-lg">
                 Beyond credit scores. Beyond binary trust. ChittyChain measures what 
-                matters using the <span className="text-emerald-400 font-semibold">STCONJ</span> framework:
-                <br />Source, Time, Chain, Outcomes, Network, and Justice.
+                matters using the <span className="text-emerald-400 font-semibold">CONJST</span> framework:
+                <br />Chain, Outcomes, Network, Justice, Source, and Time.
               </p>
             </div>
 
@@ -68,12 +68,12 @@ export default function HeroSection() {
             <div className="space-y-4">
               <div className="text-center">
                 <div className="text-3xl font-bold text-white mb-2">
-                  <span className="text-emerald-400">S</span>
-                  <span className="text-blue-400">T</span>
                   <span className="text-cyan-400">C</span>
                   <span className="text-purple-400">O</span>
                   <span className="text-yellow-400">N</span>
                   <span className="text-red-400">J</span>
+                  <span className="text-emerald-400">S</span>
+                  <span className="text-blue-400">T</span>
                 </div>
                 <div className="text-sm text-slate-400 tracking-wider">
                   TRUST FRAMEWORK
@@ -94,7 +94,7 @@ export default function HeroSection() {
 
             <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold inline-flex items-center">
               <Activity className="w-5 h-5 mr-2" />
-              Experience STCONJ Trust
+              Experience CONJST Trust
             </Button>
           </div>
 
@@ -113,7 +113,7 @@ export default function HeroSection() {
                 <div className="bg-slate-700/50 rounded-lg p-4">
                   <div className="text-sm text-slate-400 mb-2">Case ID: CHT-2024-001</div>
                   <div className="text-white font-medium">Contract Evidence Package</div>
-                  <div className="text-slate-300 text-sm mt-1">Blockchain verified with STCONJ trust framework</div>
+                  <div className="text-slate-300 text-sm mt-1">Blockchain verified with CONJST trust framework</div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4 text-center">
