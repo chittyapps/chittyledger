@@ -83,7 +83,7 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
               <div className="text-xs text-institutional-600">{verifyHours}h ago</div>
             </div>
             <div className="text-xs text-forensic-red-600">
-              {evidence.status !== 'MINTED' ? '⚠️ Can degrade' : '✓ Preserved'}
+              {evidence.status !== 'MINTED' ? '⚠️ Can degrade' : '✓ In Ledger'}
             </div>
           </div>
         )}
@@ -95,10 +95,10 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
               <Lock className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-institutional-900">Evidence Preserved</div>
+              <div className="text-sm font-medium text-institutional-900">Added to Ledger</div>
               <div className="text-xs text-institutional-600">{mintHours}h ago</div>
             </div>
-            <div className="text-xs text-legal-gold-600">🔒 Permanently preserved</div>
+            <div className="text-xs text-legal-gold-600">🔒 ChittyChain Ledger</div>
           </div>
         ) : (
           <div className="flex items-center space-x-4 opacity-50">
@@ -106,14 +106,14 @@ export default function TrustTimeline({ evidence }: TrustTimelineProps) {
               <AlertTriangle className="w-4 h-4 text-institutional-500" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-institutional-500">Not Preserved</div>
+              <div className="text-sm font-medium text-institutional-500">Not in Ledger</div>
               <div className="text-xs text-institutional-400">Evidence can continue to degrade</div>
             </div>
             <button 
               className="text-xs bg-institutional-300 text-institutional-600 px-3 py-1 rounded-full cursor-not-allowed"
               disabled
             >
-              Not Eligible
+              Not Qualified
             </button>
           </div>
         )}

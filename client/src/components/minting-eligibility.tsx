@@ -152,7 +152,7 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
               className="text-institutional-500 border-institutional-300"
               disabled
             >
-              Requirements Not Met
+              Ledger Standards Not Met
             </Button>
           </div>
         )}
