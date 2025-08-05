@@ -84,8 +84,11 @@ export const masterEvidence = pgTable("master_evidence", {
   lastTrustUpdate: timestamp("last_trust_update").defaultNow().notNull(),
   corroborationCount: integer("corroboration_count").default(0),
   conflictCount: integer("conflict_count").default(0),
+  // Blockchain minting criteria - separate from trust scores
   mintingEligible: boolean("minting_eligible").default(false),
   mintingScore: decimal("minting_score", { precision: 3, scale: 2 }).default("0.00"),
+  // ChittyTrust scoring system - separate evaluation
+  chittytrustScore: decimal("chittytrust_score", { precision: 3, scale: 2 }).default("0.00"),
   caseId: varchar("case_id").references(() => cases.id),
   uploadedBy: varchar("uploaded_by").references(() => users.id),
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),

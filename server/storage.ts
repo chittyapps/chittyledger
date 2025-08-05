@@ -122,6 +122,7 @@ export class MemStorage implements IStorage {
       conflictCount: 0,
       mintingEligible: true,
       mintingScore: "0.85",
+      chittytrustScore: "0.92",
       caseId: case1.id,
       uploadedBy: attorney1.id,
       uploadedAt: new Date("2024-01-15T09:32:00Z"),
@@ -148,6 +149,7 @@ export class MemStorage implements IStorage {
       conflictCount: 0,
       mintingEligible: false,
       mintingScore: "0.45",
+      chittytrustScore: "0.78",
       caseId: case1.id,
       uploadedBy: attorney1.id,
       uploadedAt: new Date("2024-01-15T10:15:00Z"),
@@ -174,6 +176,7 @@ export class MemStorage implements IStorage {
       conflictCount: 1,
       mintingEligible: false,
       mintingScore: "0.15",
+      chittytrustScore: "0.22",
       caseId: case1.id,
       uploadedBy: attorney1.id,
       uploadedAt: new Date("2024-01-15T16:22:00Z"),
@@ -334,6 +337,7 @@ export class MemStorage implements IStorage {
       conflictCount: 0,
       mintingEligible: false,
       mintingScore: "0.00",
+      chittytrustScore: "0.00",
       uploadedBy: evidenceData.caseId || null, // TODO: get from auth context
       uploadedAt: new Date(),
       verifiedAt: null,
@@ -449,6 +453,66 @@ export class MemStorage implements IStorage {
       ...evidence,
       mintingEligible: eligibility.eligible,
       mintingScore: eligibility.score,
+    };
+
+    this.evidence.set(evidenceId, updatedEvidence);
+    return updatedEvidence;
+  }
+
+  // Calculate ChittyTrust score - separate from blockchain minting criteria
+  async calculateChittyTrustScore(evidenceId: string): Promise<string> {
+    const evidence = this.evidence.get(evidenceId);
+    if (!evidence) return "0.00";
+
+    let score = parseFloat(evidence.originalTrustScore);
+
+    // ChittyTrust evaluates based on 6D Trust Revolution metrics
+    // Source reliability (already in original trust score)
+    
+    // Time factor - how current/relevant is the evidence
+    const ageHours = (new Date().getTime() - evidence.uploadedAt.getTime()) / (1000 * 60 * 60);
+    if (ageHours < 1) score += 0.05; // Very fresh
+    else if (ageHours > 720) score -= 0.10; // Over 30 days old
+
+    // Chain of custody integrity
+    const custodyRecords = Array.from(this.chainOfCustody.values())
+      .filter(c => c.evidenceId === evidenceId);
+    if (custodyRecords.length > 0) {
+      score += 0.03; // Proper chain of custody tracking
+    }
+
+    // Network corroboration
+    score += evidence.corroborationCount * 0.02;
+
+    // Conflict resolution
+    score -= evidence.conflictCount * 0.08;
+
+    // Justice/fairness - evidence tier quality
+    const tierMultipliers: Record<string, number> = {
+      'SELF_AUTHENTICATING': 1.1,
+      'GOVERNMENT': 1.08,
+      'FINANCIAL_INSTITUTION': 1.05,
+      'INDEPENDENT_THIRD_PARTY': 1.02,
+      'BUSINESS_RECORDS': 1.0,
+      'FIRST_PARTY_ADVERSE': 0.95,
+      'FIRST_PARTY_FRIENDLY': 0.90,
+      'UNCORROBORATED_PERSON': 0.85
+    };
+    
+    score *= (tierMultipliers[evidence.evidenceTier] || 1.0);
+
+    return Math.max(0, Math.min(1, score)).toFixed(2);
+  }
+
+  // Update ChittyTrust score for evidence
+  async updateChittyTrustScore(evidenceId: string): Promise<Evidence | undefined> {
+    const chittyScore = await this.calculateChittyTrustScore(evidenceId);
+    const evidence = this.evidence.get(evidenceId);
+    if (!evidence) return undefined;
+
+    const updatedEvidence = {
+      ...evidence,
+      chittytrustScore: chittyScore,
     };
 
     this.evidence.set(evidenceId, updatedEvidence);

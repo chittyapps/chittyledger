@@ -83,3 +83,14 @@ Color scheme: Dark themes with emerald green accents (inspired by ChittyTrust re
 - **User Feedback**: "Chitty chain doesn't measure, chitty chain is the ledger"
 - **Implementation**: Updated hero section and messaging to emphasize ChittyChain as the immutable evidence ledger rather than a measurement system
 - **Impact**: Clarified that ChittyChain IS the ledger that records evidence, not a system that measures evidence
+
+### Scoring System Separation
+- **Date**: January 5, 2025
+- **Change**: Separated blockchain minting criteria from ChittyTrust scoring system
+- **User Feedback**: "i woudn' t put he pth to teh chain vs teh chittytrust scors"
+- **Implementation**: 
+  - Created distinct ChittyTrust scoring using 6D Trust Revolution framework (Source, Time, Chain, Network, Outcomes, Justice)
+  - Blockchain minting criteria focus purely on permanence eligibility (70%+ threshold)
+  - ChittyTrust evaluates evidence quality and reliability independently
+  - Two separate API endpoints and UI components for each system
+- **Impact**: Clear separation between evidence quality evaluation (ChittyTrust) and blockchain permanence eligibility (minting criteria)

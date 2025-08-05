@@ -4,6 +4,7 @@ import EvidenceTable from "@/components/evidence-table";
 import CaseSidebar from "@/components/case-sidebar";
 import TrustTimeline from "@/components/trust-timeline";
 import MintingEligibility from "@/components/minting-eligibility";
+import ChittyTrustScoring from "@/components/chittytrust-scoring";
 import { useQuery } from "@tanstack/react-query";
 
 export default function EvidenceManagement() {
@@ -45,11 +46,12 @@ export default function EvidenceManagement() {
             </div>
           </div>
           
-          {/* Trust Timeline Demo */}
+          {/* Trust Systems Demo */}
           {sampleEvidence && (
             <div className="col-span-12 mb-8">
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-3 gap-6">
                 <TrustTimeline evidence={sampleEvidence} />
+                <ChittyTrustScoring evidence={sampleEvidence} />
                 <MintingEligibility evidenceId={sampleEvidence.id} />
               </div>
             </div>

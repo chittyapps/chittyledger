@@ -141,13 +141,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Check minting eligibility
+  // Check minting eligibility - blockchain path
   app.get("/api/evidence/:id/minting-eligibility", async (req, res) => {
     try {
       const eligibility = await storage.calculateMintingEligibility(req.params.id);
       res.json(eligibility);
     } catch (error) {
       res.status(500).json({ error: "Failed to check minting eligibility" });
+    }
+  });
+
+  // Get ChittyTrust score - separate scoring system
+  app.get("/api/evidence/:id/chittytrust-score", async (req, res) => {
+    try {
+      const score = await storage.calculateChittyTrustScore(req.params.id);
+      res.json({ score });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to calculate ChittyTrust score" });
+    }
+  });
+
+  // Update ChittyTrust score
+  app.post("/api/evidence/:id/update-chittytrust", async (req, res) => {
+    try {
+      const updatedEvidence = await storage.updateChittyTrustScore(req.params.id);
+      if (!updatedEvidence) {
+        return res.status(404).json({ error: "Evidence not found" });
+      }
+      res.json(updatedEvidence);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update ChittyTrust score" });
     }
   });
 
