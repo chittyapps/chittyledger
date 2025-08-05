@@ -2,8 +2,16 @@ import { Button } from "@/components/ui/button";
 import { Filter, Plus } from "lucide-react";
 import EvidenceTable from "@/components/evidence-table";
 import CaseSidebar from "@/components/case-sidebar";
+import TrustTimeline from "@/components/trust-timeline";
+import { useQuery } from "@tanstack/react-query";
 
 export default function EvidenceManagement() {
+  const { data: evidence } = useQuery({
+    queryKey: ['/api/evidence']
+  });
+
+  const sampleEvidence = evidence?.[0];
+
   return (
     <section className="py-24 bg-institutional-900/30 min-h-screen">
       <div className="container mx-auto px-8">
@@ -36,6 +44,13 @@ export default function EvidenceManagement() {
             </div>
           </div>
           
+          {/* Trust Timeline Demo */}
+          {sampleEvidence && (
+            <div className="col-span-12 mb-8">
+              <TrustTimeline evidence={sampleEvidence} />
+            </div>
+          )}
+
           {/* Evidence Grid */}
           <div className="col-span-8">
             <EvidenceTable />

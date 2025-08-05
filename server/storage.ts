@@ -111,9 +111,13 @@ export class MemStorage implements IStorage {
       description: "Quarterly financial statement showing payment discrepancies",
       evidenceTier: "FINANCIAL_INSTITUTION",
       trustScore: "0.94",
+      originalTrustScore: "0.94",
       status: "MINTED",
       blockNumber: "2847291",
       hashValue: "0x4a7b8c9d2e1f3a5b6c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
+      mintedAt: new Date("2024-01-15T11:47:00Z"),
+      trustDegradationRate: "0.0000",
+      lastTrustUpdate: new Date("2024-01-15T11:47:00Z"),
       caseId: case1.id,
       uploadedBy: attorney1.id,
       uploadedAt: new Date("2024-01-15T09:32:00Z"),
@@ -128,14 +132,18 @@ export class MemStorage implements IStorage {
       fileSize: "5.1 MB",
       description: "Photographic evidence of property condition",
       evidenceTier: "INDEPENDENT_THIRD_PARTY",
-      trustScore: "0.80",
-      status: "PENDING",
+      trustScore: "0.65",
+      originalTrustScore: "0.80",
+      status: "VERIFIED",
       blockNumber: null,
       hashValue: null,
+      mintedAt: null,
+      trustDegradationRate: "0.0001",
+      lastTrustUpdate: new Date("2024-01-15T10:15:00Z"),
       caseId: case1.id,
       uploadedBy: attorney1.id,
       uploadedAt: new Date("2024-01-15T10:15:00Z"),
-      verifiedAt: null,
+      verifiedAt: new Date("2024-01-15T14:30:00Z"),
     };
 
     const evidence3: Evidence = {
@@ -146,14 +154,18 @@ export class MemStorage implements IStorage {
       fileSize: "1.2 MB",
       description: "Witness testimony regarding the incident",
       evidenceTier: "UNCORROBORATED_PERSON",
-      trustScore: "0.20",
+      trustScore: "0.05",
+      originalTrustScore: "0.20",
       status: "REQUIRES_CORROBORATION",
       blockNumber: null,
       hashValue: null,
+      mintedAt: null,
+      trustDegradationRate: "0.0002",
+      lastTrustUpdate: new Date("2024-01-15T16:22:00Z"),
       caseId: case1.id,
       uploadedBy: attorney1.id,
-      uploadedAt: new Date("2024-01-15T14:20:00Z"),
-      verifiedAt: null,
+      uploadedAt: new Date("2024-01-15T16:22:00Z"),
+      verifiedAt: new Date("2024-01-15T18:45:00Z"),
     };
 
     this.evidence.set(evidence1.id, evidence1);
@@ -232,6 +244,7 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id: randomUUID(),
+      role: insertUser.role || 'attorney',
       createdAt: new Date(),
     };
     this.users.set(user.id, user);
@@ -250,6 +263,12 @@ export class MemStorage implements IStorage {
   async createCase(caseData: InsertCase): Promise<Case> {
     const case_: Case = {
       ...caseData,
+      description: caseData.description || null,
+      parties: caseData.parties || null,
+      nextHearing: caseData.nextHearing || null,
+      courtroom: caseData.courtroom || null,
+      judge: caseData.judge || null,
+      attorneyId: caseData.attorneyId || null,
       id: randomUUID(),
       status: 'active',
       createdAt: new Date(),
@@ -283,15 +302,23 @@ export class MemStorage implements IStorage {
 
   async createEvidence(evidenceData: InsertEvidence): Promise<Evidence> {
     const artifactCounter = this.evidence.size + 1;
+    const originalTrust = this.calculateTrustScore(evidenceData.evidenceTier as EvidenceTier);
     const evidence: Evidence = {
       ...evidenceData,
+      description: evidenceData.description || null,
+      fileSize: evidenceData.fileSize || null,
+      caseId: evidenceData.caseId || null,
       id: randomUUID(),
       artifactId: `ART-${artifactCounter.toString().padStart(6, '0')}`,
-      trustScore: this.calculateTrustScore(evidenceData.evidenceTier as EvidenceTier),
+      trustScore: originalTrust,
+      originalTrustScore: originalTrust,
       status: "PENDING",
       blockNumber: null,
       hashValue: null,
-      uploadedBy: evidenceData.caseId, // TODO: get from auth context
+      mintedAt: null,
+      trustDegradationRate: "0.0001", // Default degradation rate
+      lastTrustUpdate: new Date(),
+      uploadedBy: evidenceData.caseId || null, // TODO: get from auth context
       uploadedAt: new Date(),
       verifiedAt: null,
     };
@@ -317,6 +344,7 @@ export class MemStorage implements IStorage {
     const factCounter = this.atomicFacts.size + 1;
     const fact: AtomicFact = {
       ...factData,
+      evidenceId: factData.evidenceId || null,
       id: randomUUID(),
       factId: `FACT-${factCounter.toString().padStart(4, '0')}`,
       extractedAt: new Date(),
@@ -363,6 +391,94 @@ export class MemStorage implements IStorage {
       'UNCORROBORATED_PERSON': 0.20,
     };
     return scores[tier].toFixed(2);
+  }
+
+  // Trust degradation logic - everything degrades except minted evidence
+  async calculateCurrentTrustScore(evidenceId: string): Promise<string> {
+    const evidence = this.evidence.get(evidenceId);
+    if (!evidence) return "0.00";
+
+    // If evidence is minted, trust is locked at verification moment
+    if (evidence.status === "MINTED" && evidence.mintedAt) {
+      return evidence.trustScore;
+    }
+
+    // Calculate time-based degradation for non-minted evidence
+    const now = new Date();
+    const lastUpdate = evidence.lastTrustUpdate;
+    const hoursElapsed = (now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60);
+    
+    const originalTrust = parseFloat(evidence.originalTrustScore);
+    const degradationRate = parseFloat(evidence.trustDegradationRate || "0.0001");
+    
+    // Trust degrades over time if not minted
+    const currentTrust = Math.max(0, originalTrust - (degradationRate * hoursElapsed));
+    
+    return currentTrust.toFixed(2);
+  }
+
+  // Mint evidence - locks trust score at current moment
+  async mintEvidence(evidenceId: string, blockNumber: string, hashValue: string): Promise<Evidence | undefined> {
+    const evidence = this.evidence.get(evidenceId);
+    if (!evidence) return undefined;
+
+    const currentTrust = await this.calculateCurrentTrustScore(evidenceId);
+    
+    const updatedEvidence = {
+      ...evidence,
+      status: "MINTED" as const,
+      blockNumber,
+      hashValue,
+      mintedAt: new Date(),
+      trustScore: currentTrust, // Lock trust at minting moment
+      trustDegradationRate: "0.0000", // No more degradation after minting
+      lastTrustUpdate: new Date(),
+    };
+    
+    this.evidence.set(evidenceId, updatedEvidence);
+    
+    // Add chain of custody entry
+    await this.addChainOfCustodyEntry({
+      evidenceId,
+      action: "MINTED",
+      performedBy: evidence.uploadedBy,
+      timestamp: new Date(),
+      location: "Blockchain",
+      notes: `Minted to blockchain at block ${blockNumber}`,
+      hashBefore: evidence.hashValue,
+      hashAfter: hashValue,
+    });
+    
+    return updatedEvidence;
+  }
+
+  // Verify evidence - trust starts degrading from this moment if not minted
+  async verifyEvidence(evidenceId: string): Promise<Evidence | undefined> {
+    const evidence = this.evidence.get(evidenceId);
+    if (!evidence) return undefined;
+
+    const updatedEvidence = {
+      ...evidence,
+      status: "VERIFIED" as const,
+      verifiedAt: new Date(),
+      lastTrustUpdate: new Date(), // Start degradation timer
+    };
+    
+    this.evidence.set(evidenceId, updatedEvidence);
+    
+    // Add chain of custody entry
+    await this.addChainOfCustodyEntry({
+      evidenceId,
+      action: "VERIFIED",
+      performedBy: evidence.uploadedBy,
+      timestamp: new Date(),
+      location: "Legal Platform",
+      notes: "Evidence verified - trust degradation begins",
+      hashBefore: evidence.hashValue,
+      hashAfter: evidence.hashValue,
+    });
+    
+    return updatedEvidence;
   }
 }
 

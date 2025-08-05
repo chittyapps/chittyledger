@@ -126,6 +126,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Verify evidence - starts trust degradation timer
+  app.post("/api/evidence/:id/verify", async (req, res) => {
+    try {
+      const verifiedEvidence = await storage.verifyEvidence(req.params.id);
+      
+      if (!verifiedEvidence) {
+        return res.status(404).json({ error: "Evidence not found" });
+      }
+      
+      res.json(verifiedEvidence);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to verify evidence" });
+    }
+  });
+
+  // Mint evidence - locks trust score permanently
+  app.post("/api/evidence/:id/mint", async (req, res) => {
+    try {
+      const { blockNumber, hashValue } = req.body;
+      
+      if (!blockNumber || !hashValue) {
+        return res.status(400).json({ error: "Block number and hash value are required" });
+      }
+      
+      const mintedEvidence = await storage.mintEvidence(req.params.id, blockNumber, hashValue);
+      
+      if (!mintedEvidence) {
+        return res.status(404).json({ error: "Evidence not found" });
+      }
+      
+      res.json(mintedEvidence);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to mint evidence" });
+    }
+  });
+
+  // Get current trust score (with degradation calculation)
+  app.get("/api/evidence/:id/trust", async (req, res) => {
+    try {
+      const currentTrust = await storage.calculateCurrentTrustScore(req.params.id);
+      const evidence = await storage.getEvidence(req.params.id);
+      
+      if (!evidence) {
+        return res.status(404).json({ error: "Evidence not found" });
+      }
+      
+      res.json({
+        evidenceId: req.params.id,
+        currentTrustScore: currentTrust,
+        originalTrustScore: evidence.originalTrustScore,
+        status: evidence.status,
+        mintedAt: evidence.mintedAt,
+        verifiedAt: evidence.verifiedAt,
+        degradationRate: evidence.trustDegradationRate,
+        lastUpdate: evidence.lastTrustUpdate,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to calculate trust score" });
+    }
+  });
+
   // Atomic Facts endpoints
   app.get("/api/evidence/:evidenceId/facts", async (req, res) => {
     try {
