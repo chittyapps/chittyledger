@@ -19,12 +19,12 @@ export default function HeroSection() {
   }
 
   const trustMetrics = [
+    { label: "S", value: "Source", color: "text-emerald-400" },
+    { label: "T", value: "Time", color: "text-blue-400" },
     { label: "C", value: "Chain", color: "text-cyan-400" },
     { label: "O", value: "Outcomes", color: "text-purple-400" },
     { label: "N", value: "Network", color: "text-yellow-400" },
-    { label: "J", value: "Justice", color: "text-red-400" },
-    { label: "S", value: "Source", color: "text-emerald-400" },
-    { label: "T", value: "Time", color: "text-blue-400" }
+    { label: "J", value: "Justice", color: "text-red-400" }
   ];
 
   return (
@@ -59,37 +59,20 @@ export default function HeroSection() {
               
               <p className="text-xl text-slate-300 leading-relaxed max-w-lg">
                 Beyond credit scores. Beyond binary trust. ChittyChain measures what 
-                matters using the <span className="text-emerald-400 font-semibold">CONJST</span> framework:
-                <br />Chain, Outcomes, Network, Justice, Source, and Time.
+                matters: Source, Time, Chain, Outcomes, Network, and Justice.
               </p>
             </div>
 
-            {/* STCONJ Trust Metrics */}
-            <div className="space-y-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-2">
-                  <span className="text-cyan-400">C</span>
-                  <span className="text-purple-400">O</span>
-                  <span className="text-yellow-400">N</span>
-                  <span className="text-red-400">J</span>
-                  <span className="text-emerald-400">S</span>
-                  <span className="text-blue-400">T</span>
-                </div>
-                <div className="text-sm text-slate-400 tracking-wider">
-                  TRUST FRAMEWORK
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-                {trustMetrics.map((metric, i) => (
-                  <div key={i} className="flex flex-col items-center">
-                    <div className={`w-12 h-12 rounded-lg border-2 border-slate-600 bg-slate-800 flex items-center justify-center text-xl font-bold ${metric.color}`}>
-                      {metric.label}
-                    </div>
-                    <span className="text-xs text-slate-400 mt-1 text-center">{metric.value}</span>
+            {/* Trust Metrics */}
+            <div className="flex items-center space-x-4">
+              {trustMetrics.map((metric, i) => (
+                <div key={i} className="flex flex-col items-center">
+                  <div className={`w-12 h-12 rounded-lg border-2 border-slate-600 bg-slate-800 flex items-center justify-center text-xl font-bold ${metric.color}`}>
+                    {metric.label}
                   </div>
-                ))}
-              </div>
+                  <span className="text-xs text-slate-400 mt-1">{metric.value}</span>
+                </div>
+              ))}
             </div>
 
             <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold inline-flex items-center">
