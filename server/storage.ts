@@ -355,91 +355,121 @@ export class MemStorage implements IStorage {
     return updatedEvidence;
   }
 
-  // Calculate minting eligibility based on multiple criteria
-  async calculateMintingEligibility(evidenceId: string): Promise<{ eligible: boolean; score: string; reasons: string[] }> {
+  // Calculate blockchain minting eligibility using 6D Trust evaluation
+  async calculateMintingEligibility(evidenceId: string): Promise<{ eligible: boolean; score: string; reasons: string[]; sixDScores: any }> {
     const evidence = this.evidence.get(evidenceId);
-    if (!evidence) return { eligible: false, score: "0.00", reasons: ["Evidence not found"] };
+    if (!evidence) return { eligible: false, score: "0.00", reasons: ["Evidence not found"], sixDScores: {} };
 
     const reasons: string[] = [];
-    let score = 0;
+    
+    // 6D Trust Revolution Framework for Blockchain Eligibility
+    const sixDScores = {
+      source: 0,
+      time: 0,
+      chain: 0,
+      network: 0,
+      outcomes: 0,
+      justice: 0
+    };
 
-    // Base trust score requirement (min 0.60)
-    const currentTrust = parseFloat(await this.calculateCurrentTrustScore(evidenceId));
-    if (currentTrust >= 0.80) {
-      score += 30;
-      reasons.push("✓ High trust score (0.80+)");
-    } else if (currentTrust >= 0.60) {
-      score += 20;
-      reasons.push("✓ Adequate trust score (0.60+)");
-    } else {
-      reasons.push("✗ Trust score too low (<0.60)");
-    }
-
-    // Evidence tier requirement
+    // 1. SOURCE - Evidence tier reliability (max 20 points)
     const tierScores: Record<string, number> = {
-      'SELF_AUTHENTICATING': 25,
-      'GOVERNMENT': 25,
-      'FINANCIAL_INSTITUTION': 20,
-      'INDEPENDENT_THIRD_PARTY': 15,
-      'BUSINESS_RECORDS': 10,
-      'FIRST_PARTY_ADVERSE': 5,
-      'FIRST_PARTY_FRIENDLY': 0,
+      'SELF_AUTHENTICATING': 20,
+      'GOVERNMENT': 18,
+      'FINANCIAL_INSTITUTION': 16,
+      'INDEPENDENT_THIRD_PARTY': 12,
+      'BUSINESS_RECORDS': 8,
+      'FIRST_PARTY_ADVERSE': 4,
+      'FIRST_PARTY_FRIENDLY': 2,
       'UNCORROBORATED_PERSON': 0
     };
-    
-    const tierScore = tierScores[evidence.evidenceTier] || 0;
-    score += tierScore;
-    if (tierScore > 0) {
-      reasons.push(`✓ Evidence tier: ${evidence.evidenceTier}`);
+    sixDScores.source = tierScores[evidence.evidenceTier] || 0;
+    if (sixDScores.source >= 16) {
+      reasons.push(`✓ Source: High-tier evidence (${evidence.evidenceTier})`);
+    } else if (sixDScores.source >= 8) {
+      reasons.push(`✓ Source: Acceptable tier (${evidence.evidenceTier})`);
     } else {
-      reasons.push(`✗ Evidence tier too low: ${evidence.evidenceTier}`);
+      reasons.push(`✗ Source: Low-tier evidence (${evidence.evidenceTier})`);
     }
 
-    // Verification requirement
-    if (evidence.status === 'VERIFIED' || evidence.status === 'MINTED') {
-      score += 15;
-      reasons.push("✓ Evidence verified");
-    } else {
-      reasons.push("✗ Evidence not verified");
-    }
-
-    // Corroboration bonus
-    if (evidence.corroborationCount >= 3) {
-      score += 15;
-      reasons.push(`✓ Strong corroboration (${evidence.corroborationCount} sources)`);
-    } else if (evidence.corroborationCount >= 1) {
-      score += 10;
-      reasons.push(`✓ Some corroboration (${evidence.corroborationCount} sources)`);
-    } else {
-      reasons.push("✗ No corroboration");
-    }
-
-    // Conflict penalty
-    if (evidence.conflictCount > 0) {
-      score -= evidence.conflictCount * 10;
-      reasons.push(`✗ Conflicts detected (${evidence.conflictCount})`);
-    } else {
-      score += 10;
-      reasons.push("✓ No conflicts");
-    }
-
-    // Age penalty (older evidence is harder to mint)
+    // 2. TIME - Recency and relevance (max 15 points)
     const ageHours = (new Date().getTime() - evidence.uploadedAt.getTime()) / (1000 * 60 * 60);
     if (ageHours < 24) {
-      score += 5;
-      reasons.push("✓ Recent evidence (<24h)");
-    } else if (ageHours > 168) { // 1 week
-      score -= 10;
-      reasons.push("✗ Evidence is old (>1 week)");
+      sixDScores.time = 15;
+      reasons.push("✓ Time: Very recent evidence (<24h)");
+    } else if (ageHours < 168) { // 1 week
+      sixDScores.time = 12;
+      reasons.push("✓ Time: Recent evidence (<1 week)");
+    } else if (ageHours < 720) { // 30 days
+      sixDScores.time = 8;
+      reasons.push("✓ Time: Moderately recent (<30 days)");
+    } else {
+      sixDScores.time = 0;
+      reasons.push("✗ Time: Evidence is old (>30 days)");
     }
 
-    const finalScore = Math.max(0, Math.min(100, score)) / 100;
-    const eligible = finalScore >= 0.70; // Need 70% score to mint
+    // 3. CHAIN - Chain of custody integrity (max 15 points)
+    const custodyRecords = Array.from(this.chainOfCustody.values())
+      .filter(c => c.evidenceId === evidenceId);
+    if (custodyRecords.length >= 3) {
+      sixDScores.chain = 15;
+      reasons.push("✓ Chain: Complete custody tracking");
+    } else if (custodyRecords.length >= 1) {
+      sixDScores.chain = 10;
+      reasons.push("✓ Chain: Basic custody tracking");
+    } else {
+      sixDScores.chain = 0;
+      reasons.push("✗ Chain: No custody tracking");
+    }
+
+    // 4. NETWORK - Corroboration from multiple sources (max 20 points)
+    if (evidence.corroborationCount >= 3) {
+      sixDScores.network = 20;
+      reasons.push(`✓ Network: Strong corroboration (${evidence.corroborationCount} sources)`);
+    } else if (evidence.corroborationCount >= 2) {
+      sixDScores.network = 15;
+      reasons.push(`✓ Network: Good corroboration (${evidence.corroborationCount} sources)`);
+    } else if (evidence.corroborationCount >= 1) {
+      sixDScores.network = 8;
+      reasons.push(`✓ Network: Some corroboration (${evidence.corroborationCount} sources)`);
+    } else {
+      sixDScores.network = 0;
+      reasons.push("✗ Network: No corroboration");
+    }
+
+    // 5. OUTCOMES - Verification status (max 15 points)
+    if (evidence.status === 'VERIFIED' || evidence.status === 'MINTED') {
+      sixDScores.outcomes = 15;
+      reasons.push("✓ Outcomes: Evidence verified");
+    } else if (evidence.status === 'REQUIRES_CORROBORATION') {
+      sixDScores.outcomes = 5;
+      reasons.push("✗ Outcomes: Requires corroboration");
+    } else {
+      sixDScores.outcomes = 0;
+      reasons.push("✗ Outcomes: Not verified");
+    }
+
+    // 6. JUSTICE - Conflict resolution (max 15 points)
+    if (evidence.conflictCount === 0) {
+      sixDScores.justice = 15;
+      reasons.push("✓ Justice: No conflicts detected");
+    } else if (evidence.conflictCount === 1) {
+      sixDScores.justice = 8;
+      reasons.push("✗ Justice: Minor conflicts present");
+    } else {
+      sixDScores.justice = 0;
+      reasons.push(`✗ Justice: Multiple conflicts (${evidence.conflictCount})`);
+    }
+
+    const totalScore = Object.values(sixDScores).reduce((sum, score) => sum + score, 0);
+    const finalScore = totalScore / 100; // Convert to 0-1 scale
+    const eligible = finalScore >= 0.70; // Need 70% across all 6D metrics
 
     return {
       eligible,
       score: finalScore.toFixed(2),
-      reasons
+      reasons,
+      sixDScores
     };
   }
 

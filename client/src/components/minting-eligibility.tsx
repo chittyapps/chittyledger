@@ -1,4 +1,4 @@
-import { Shield, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Shield, CheckCircle, XCircle, AlertCircle, TrendingUp, Clock, Link, Users, Scale, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -58,8 +58,62 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
         </div>
       </div>
 
-      {/* Requirements Checklist */}
-      <div className="space-y-3 mb-6">
+      {/* 6D Trust Framework */}
+      <div className="space-y-4 mb-6">
+        <h4 className="font-medium text-institutional-700 text-sm uppercase tracking-wide">
+          6D Trust Revolution - Path to Chain
+        </h4>
+        
+        {eligibility.sixDScores && (
+          <div className="space-y-3">
+            {[
+              { key: 'source', name: 'Source', icon: Shield, max: 20, description: 'Evidence tier reliability' },
+              { key: 'time', name: 'Time', icon: Clock, max: 15, description: 'Recency and relevance' },
+              { key: 'chain', name: 'Chain', icon: Link, max: 15, description: 'Custody integrity' },
+              { key: 'network', name: 'Network', icon: Users, max: 20, description: 'Corroboration strength' },
+              { key: 'outcomes', name: 'Outcomes', icon: Eye, max: 15, description: 'Verification status' },
+              { key: 'justice', name: 'Justice', icon: Scale, max: 15, description: 'Conflict resolution' }
+            ].map((dimension) => {
+              const score = eligibility.sixDScores[dimension.key] || 0;
+              const percentage = (score / dimension.max) * 100;
+              
+              return (
+                <div key={dimension.key} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <dimension.icon className="w-4 h-4 text-institutional-500" />
+                    <div>
+                      <div className="font-medium text-institutional-700 text-sm">{dimension.name}</div>
+                      <div className="text-xs text-institutional-500">{dimension.description}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`font-bold text-sm ${
+                      percentage >= 80 ? 'text-legal-gold-600' : 
+                      percentage >= 50 ? 'text-yellow-600' : 
+                      'text-forensic-red-600'
+                    }`}>
+                      {score}/{dimension.max}
+                    </div>
+                    <div className="w-16 h-2 bg-institutional-200 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-500 ${
+                          percentage >= 80 ? 'bg-legal-gold-500' : 
+                          percentage >= 50 ? 'bg-yellow-500' : 
+                          'bg-forensic-red-500'
+                        }`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Summary Results */}
+      <div className="space-y-2 mb-6 text-sm">
         {eligibility.reasons.map((reason: string, index: number) => {
           const isPositive = reason.startsWith('✓');
           const isNegative = reason.startsWith('✗');
@@ -68,11 +122,8 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
             <div key={index} className="flex items-center space-x-3">
               {isPositive && <CheckCircle className="w-4 h-4 text-legal-gold-500" />}
               {isNegative && <XCircle className="w-4 h-4 text-forensic-red-500" />}
-              {!isPositive && !isNegative && <AlertCircle className="w-4 h-4 text-institutional-400" />}
-              <span className={`text-sm ${
-                isPositive ? 'text-institutional-700' : 
-                isNegative ? 'text-forensic-red-600' : 
-                'text-institutional-500'
+              <span className={`text-xs ${
+                isPositive ? 'text-institutional-600' : 'text-forensic-red-600'
               }`}>
                 {reason.replace(/^[✓✗]\s*/, '')}
               </span>
@@ -110,10 +161,10 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
       {/* Key Insight */}
       <div className="mt-4 p-4 bg-legal-gold-50 rounded-lg border border-legal-gold-200">
         <div className="flex items-start space-x-3">
-          <AlertCircle className="w-5 h-5 text-legal-gold-600 mt-0.5" />
+          <TrendingUp className="w-5 h-5 text-legal-gold-600 mt-0.5" />
           <div className="text-sm text-legal-gold-800">
-            <strong>Minting Requirements:</strong> Only high-quality evidence with sufficient corroboration, 
-            proper verification, and minimal conflicts can be minted to preserve blockchain integrity.
+            <strong>6D Path to Chain:</strong> Evidence must score 70%+ across all six trust dimensions 
+            (Source, Time, Chain, Network, Outcomes, Justice) to qualify for permanent blockchain preservation.
           </div>
         </div>
       </div>

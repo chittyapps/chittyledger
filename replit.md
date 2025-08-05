@@ -84,13 +84,14 @@ Color scheme: Dark themes with emerald green accents (inspired by ChittyTrust re
 - **Implementation**: Updated hero section and messaging to emphasize ChittyChain as the immutable evidence ledger rather than a measurement system
 - **Impact**: Clarified that ChittyChain IS the ledger that records evidence, not a system that measures evidence
 
-### Scoring System Separation
+### 6D Trust Integration with Blockchain Path
 - **Date**: January 5, 2025
-- **Change**: Separated blockchain minting criteria from ChittyTrust scoring system
-- **User Feedback**: "i woudn' t put he pth to teh chain vs teh chittytrust scors"
+- **Change**: Integrated 6D Trust Revolution framework as the path to blockchain minting
+- **User Feedback**: "I would putt he path to teh chain vs puttinte trust score 6d.. that's part o fteh path to the chain"
 - **Implementation**: 
-  - Created distinct ChittyTrust scoring using 6D Trust Revolution framework (Source, Time, Chain, Network, Outcomes, Justice)
-  - Blockchain minting criteria focus purely on permanence eligibility (70%+ threshold)
-  - ChittyTrust evaluates evidence quality and reliability independently
-  - Two separate API endpoints and UI components for each system
-- **Impact**: Clear separation between evidence quality evaluation (ChittyTrust) and blockchain permanence eligibility (minting criteria)
+  - 6D Trust Revolution framework (Source, Time, Chain, Network, Outcomes, Justice) now determines blockchain minting eligibility
+  - Each dimension has specific point values contributing to overall minting score
+  - Must achieve 70%+ across all six dimensions to qualify for permanent blockchain preservation
+  - Visual component shows detailed breakdown of each trust dimension
+  - Unified system where 6D evaluation IS the path to the chain
+- **Impact**: 6D Trust framework becomes the comprehensive evaluation system for blockchain permanence eligibility
