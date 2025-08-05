@@ -13,13 +13,13 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="fixed left-0 top-0 h-full w-24 nav-glass-elite z-50 flex flex-col items-center py-8">
+    <nav className="fixed left-0 top-0 h-full w-20 bg-obsidian-900/90 backdrop-blur-sm border-r border-obsidian-700 z-50 flex flex-col items-center py-8">
       <Link href="/">
         <div 
-          className="legal-seal-premium w-16 h-16 rounded-full flex items-center justify-center mb-12 cursor-pointer hover:scale-105 transition-all duration-500"
+          className="w-12 h-12 bg-gold-byzantium-500 rounded-full flex items-center justify-center mb-8 cursor-pointer hover:bg-gold-byzantium-600 transition-colors"
           data-testid="legal-seal-home"
         >
-          <Scale className="text-obsidian-950 w-8 h-8" />
+          <Scale className="text-obsidian-950 w-6 h-6" />
         </div>
       </Link>
       
@@ -35,29 +35,23 @@ export default function Navigation() {
                 data-testid={`nav-${item.label.toLowerCase()}`}
               >
                 <div 
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 relative overflow-hidden ${
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
                     isActive 
-                      ? "glass-byzantium shadow-byzantium" 
-                      : "glass-obsidian hover:glass-byzantium/50"
+                      ? "bg-gold-byzantium-500 text-obsidian-950" 
+                      : "bg-obsidian-800 text-obsidian-300 hover:bg-gold-byzantium-500 hover:text-obsidian-950"
                   }`}
                 >
-                  <Icon className={`w-6 h-6 transition-colors duration-500 ${
-                    isActive ? "text-obsidian-950" : "text-obsidian-300"
-                  }`} />
-                  
-                  {isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-gold-byzantium-500/20 to-gold-byzantium-700/30 rounded-xl animate-legal-pulse"></div>
-                  )}
+                  <Icon className="w-5 h-5" />
                 </div>
                 
                 {/* Tooltip */}
                 <div className={`
-                  absolute left-20 top-1/2 transform -translate-y-1/2 
-                  glass-obsidian rounded-lg px-3 py-2 
-                  opacity-0 group-hover:opacity-100 transition-all duration-300
-                  pointer-events-none whitespace-nowrap
+                  absolute left-16 top-1/2 transform -translate-y-1/2 
+                  bg-obsidian-800 rounded-lg px-3 py-1 border border-obsidian-600
+                  opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                  pointer-events-none whitespace-nowrap z-50
                 `}>
-                  <span className="text-sm font-tech text-obsidian-200">{item.label}</span>
+                  <span className="text-sm text-obsidian-200">{item.label}</span>
                 </div>
               </div>
             </Link>
@@ -67,11 +61,8 @@ export default function Navigation() {
       
       {/* Status Indicator */}
       <div className="mt-auto">
-        <div className="glass-obsidian rounded-xl p-3">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-emerald-verify-500 rounded-full animate-pulse"></div>
-            <Zap className="w-4 h-4 text-gold-byzantium-500" />
-          </div>
+        <div className="bg-obsidian-800 rounded-lg p-2">
+          <div className="w-2 h-2 bg-emerald-verify-500 rounded-full animate-pulse"></div>
         </div>
       </div>
     </nav>

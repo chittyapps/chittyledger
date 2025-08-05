@@ -26,7 +26,7 @@ function App() {
       <TooltipProvider>
         <div className="bg-obsidian-complex text-obsidian-50 font-sans overflow-x-hidden min-h-screen">
           <Navigation />
-          <main className="ml-24">
+          <main className="ml-20">
             <Router />
           </main>
           <Toaster />
