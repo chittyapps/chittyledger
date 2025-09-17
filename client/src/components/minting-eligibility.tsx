@@ -7,8 +7,24 @@ interface MintingEligibilityProps {
   evidenceId: string;
 }
 
+interface SixDScores {
+  source: number;
+  time: number;
+  chain: number;
+  network: number;
+  outcomes: number;
+  justice: number;
+}
+
+interface MintingEligibilityResponse {
+  eligible: boolean;
+  score: string;
+  reasons: string[];
+  sixDScores: SixDScores;
+}
+
 export default function MintingEligibility({ evidenceId }: MintingEligibilityProps) {
-  const { data: eligibility, isLoading } = useQuery({
+  const { data: eligibility, isLoading } = useQuery<MintingEligibilityResponse>({
     queryKey: [`/api/evidence/${evidenceId}/minting-eligibility`]
   });
 
@@ -74,7 +90,7 @@ export default function MintingEligibility({ evidenceId }: MintingEligibilityPro
               { key: 'outcomes', name: 'Outcomes', icon: Eye, max: 15, description: 'Verification status' },
               { key: 'justice', name: 'Justice', icon: Scale, max: 15, description: 'Conflict resolution' }
             ].map((dimension) => {
-              const score = eligibility.sixDScores[dimension.key] || 0;
+              const score = eligibility.sixDScores[dimension.key as keyof SixDScores] || 0;
               const percentage = (score / dimension.max) * 100;
               
               return (

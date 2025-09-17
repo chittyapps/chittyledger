@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(PORT=5001 npm run dev)",
+      "Bash(npm run check:*)"
+    ],
+    "deny": []
+  }
+}

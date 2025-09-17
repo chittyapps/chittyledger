@@ -2,21 +2,44 @@ import { useQuery } from "@tanstack/react-query";
 import { evidenceApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Image, AlertTriangle, MoreVertical } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FileText, Image, AlertTriangle, MoreVertical, RefreshCw } from "lucide-react";
+import { EvidenceTableSkeleton, EmptyState } from "@/components/loading-states";
 import type { Evidence } from "@shared/schema";
 
 export default function EvidenceTable() {
-  const { data: evidence, isLoading } = useQuery({
+  const { data: evidence, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["/api/evidence"],
     queryFn: () => evidenceApi.getAll(),
   });
 
   if (isLoading) {
+    return <EvidenceTableSkeleton />;
+  }
+
+  if (error) {
     return (
       <div className="data-grid rounded-2xl shadow-legal p-8">
-        <div className="text-center py-8">
-          <div className="font-tech text-legal-gold-500">Loading evidence...</div>
-        </div>
+        <Alert className="bg-red-900/20 border-red-500/50">
+          <AlertTriangle className="h-4 w-4 text-red-400" />
+          <AlertDescription className="text-red-300 mb-4">
+            Failed to load evidence data. Please try again.
+          </AlertDescription>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isRefetching}
+            className="border-red-500/50 text-red-400 hover:bg-red-900/20"
+          >
+            {isRefetching ? (
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            Retry
+          </Button>
+        </Alert>
       </div>
     );
   }
@@ -24,9 +47,11 @@ export default function EvidenceTable() {
   if (!evidence || evidence.length === 0) {
     return (
       <div className="data-grid rounded-2xl shadow-legal p-8">
-        <div className="text-center py-8">
-          <div className="text-institutional-600">No evidence found</div>
-        </div>
+        <EmptyState
+          icon={FileText}
+          title="No Evidence Available"
+          description="Evidence will appear here once uploaded and processed through the ChittyChain system."
+        />
       </div>
     );
   }

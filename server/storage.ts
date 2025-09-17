@@ -1,9 +1,9 @@
-import { 
-  type User, 
-  type InsertUser, 
-  type Case, 
+import {
+  type User,
+  type InsertUser,
+  type Case,
   type InsertCase,
-  type Evidence, 
+  type Evidence,
   type InsertEvidence,
   type AtomicFact,
   type InsertFact,
@@ -13,6 +13,8 @@ import {
   type EvidenceStatus
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { initializeDatabase, isPostgreSQLEnabled } from "./db";
+import { PostgreSQLStorage } from "./postgres-storage";
 
 export interface IStorage {
   // Users
@@ -44,6 +46,15 @@ export interface IStorage {
   // Contradictions
   getContradictions(): Promise<Contradiction[]>;
   getActiveContradictions(): Promise<Contradiction[]>;
+
+  // Trust and Minting
+  calculateCurrentTrustScore(evidenceId: string): Promise<string>;
+  verifyEvidence(evidenceId: string): Promise<Evidence | undefined>;
+  mintEvidence(evidenceId: string, blockNumber: string, hashValue: string): Promise<Evidence | undefined>;
+  calculateMintingEligibility(evidenceId: string): Promise<{ eligible: boolean; score: string; reasons: string[]; sixDScores: any }>;
+  calculateChittyTrustScore(evidenceId: string): Promise<string>;
+  updateMintingEligibility(evidenceId: string): Promise<Evidence | undefined>;
+  updateChittyTrustScore(evidenceId: string): Promise<Evidence | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -423,15 +434,16 @@ export class MemStorage implements IStorage {
     }
 
     // 4. NETWORK - Corroboration from multiple sources (max 20 points)
-    if (evidence.corroborationCount >= 3) {
+    const corroborationCount = evidence.corroborationCount || 0;
+    if (corroborationCount >= 3) {
       sixDScores.network = 20;
-      reasons.push(`✓ Network: Strong corroboration (${evidence.corroborationCount} sources)`);
-    } else if (evidence.corroborationCount >= 2) {
+      reasons.push(`✓ Network: Strong corroboration (${corroborationCount} sources)`);
+    } else if (corroborationCount >= 2) {
       sixDScores.network = 15;
-      reasons.push(`✓ Network: Good corroboration (${evidence.corroborationCount} sources)`);
-    } else if (evidence.corroborationCount >= 1) {
+      reasons.push(`✓ Network: Good corroboration (${corroborationCount} sources)`);
+    } else if (corroborationCount >= 1) {
       sixDScores.network = 8;
-      reasons.push(`✓ Network: Some corroboration (${evidence.corroborationCount} sources)`);
+      reasons.push(`✓ Network: Some corroboration (${corroborationCount} sources)`);
     } else {
       sixDScores.network = 0;
       reasons.push("✗ Network: No corroboration");
@@ -450,15 +462,16 @@ export class MemStorage implements IStorage {
     }
 
     // 6. JUSTICE - Conflict resolution (max 15 points)
-    if (evidence.conflictCount === 0) {
+    const conflictCount = evidence.conflictCount || 0;
+    if (conflictCount === 0) {
       sixDScores.justice = 15;
       reasons.push("✓ Justice: No conflicts detected");
-    } else if (evidence.conflictCount === 1) {
+    } else if (conflictCount === 1) {
       sixDScores.justice = 8;
       reasons.push("✗ Justice: Minor conflicts present");
     } else {
       sixDScores.justice = 0;
-      reasons.push(`✗ Justice: Multiple conflicts (${evidence.conflictCount})`);
+      reasons.push(`✗ Justice: Multiple conflicts (${conflictCount})`);
     }
 
     const totalScore = Object.values(sixDScores).reduce((sum, score) => sum + score, 0);
@@ -512,10 +525,10 @@ export class MemStorage implements IStorage {
     }
 
     // Network corroboration
-    score += evidence.corroborationCount * 0.02;
+    score += (evidence.corroborationCount || 0) * 0.02;
 
     // Conflict resolution
-    score -= evidence.conflictCount * 0.08;
+    score -= (evidence.conflictCount || 0) * 0.08;
 
     // Justice/fairness - evidence tier quality
     const tierMultipliers: Record<string, number> = {
@@ -698,4 +711,18 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Initialize database and create storage instance
+initializeDatabase();
+
+// Create storage instance based on availability
+function createStorage(): IStorage {
+  if (isPostgreSQLEnabled()) {
+    console.log("🐘 Using PostgreSQL storage");
+    return new PostgreSQLStorage();
+  } else {
+    console.log("💾 Using in-memory storage");
+    return new MemStorage();
+  }
+}
+
+export const storage = createStorage();
