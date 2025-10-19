@@ -1,0 +1,14 @@
+name = "chitty-github-app"
+main = "worker.ts"
+compatibility_date = "2024-10-10"
+node_compat = true
+
+[vars]
+GITHUB_APP_ID = ""
+GITHUB_WEBHOOK_SECRET = ""
+GITHUB_PRIVATE_KEY_PEM = ""
+CHITTY_TENANT_SIGNING_KEY = ""
+
+[kv_namespaces]
+# TOKEN_CACHE binding for installation tokens
+bindings = []
