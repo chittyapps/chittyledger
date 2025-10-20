@@ -1,19 +1,46 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+
+const chittyServiceOverlay = (): Plugin => ({
+  name: "chitty-service-runtime-overlay",
+});
+
+const chittyServiceCartographer = (): Plugin => ({
+  name: "chitty-service-cartographer",
+  configureServer(server) {
+    server.httpServer?.once("listening", () => {
+      const address = server.httpServer?.address();
+      if (typeof address === "object" && address) {
+        console.info(
+          `[chitty-service] development server listening on port ${address.port}`,
+        );
+      }
+    });
+  },
+});
+
+const chittyAuthBridge = (): Plugin => ({
+  name: "chitty-auth-bridge",
+  configureServer(server) {
+    server.httpServer?.once("listening", () => {
+      const address = server.httpServer?.address();
+      if (typeof address === "object" && address) {
+        console.info(
+          `[chittyauth] connect your local session via http://localhost:${address.port}/chittyos/chittyauth`,
+        );
+      }
+    });
+  },
+});
 
 export default defineConfig({
   plugins: [
     react(),
-    runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-        ]
+    chittyServiceOverlay(),
+    chittyAuthBridge(),
+    ...(process.env.NODE_ENV !== "production"
+      ? [chittyServiceCartographer()]
       : []),
   ],
   resolve: {
