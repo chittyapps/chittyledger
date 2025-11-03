@@ -104,15 +104,15 @@ export default function HeroSection() {
                 
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div className="bg-slate-700/30 rounded-lg p-3">
-                    <div className="text-emerald-400 font-bold text-lg">{stats?.evidenceArtifacts || '2,847'}</div>
+                    <div className="text-emerald-400 font-bold text-lg">{stats?.evidenceArtifacts ?? '2,847'}</div>
                     <div className="text-slate-400 text-xs">Evidence Items</div>
                   </div>
                   <div className="bg-slate-700/30 rounded-lg p-3">
-                    <div className="text-blue-400 font-bold text-lg">{stats?.verificationRate || '99.7'}%</div>
+                    <div className="text-blue-400 font-bold text-lg">{stats?.verificationRate ?? '99.7'}%</div>
                     <div className="text-slate-400 text-xs">Trust Score</div>
                   </div>
                   <div className="bg-slate-700/30 rounded-lg p-3">
-                    <div className="text-cyan-400 font-bold text-lg">{stats?.activeCases || '45'}</div>
+                    <div className="text-cyan-400 font-bold text-lg">{stats?.activeCases ?? '45'}</div>
                     <div className="text-slate-400 text-xs">Active Cases</div>
                   </div>
                 </div>

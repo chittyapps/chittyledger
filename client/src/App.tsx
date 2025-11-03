@@ -9,6 +9,8 @@ import Home from "@/pages/home";
 import EvidenceManagement from "@/pages/evidence-management";
 import NotionSync from "@/pages/notion-sync";
 import NotFound from "@/pages/not-found";
+import Search from "@/pages/search";
+import Chain from "@/pages/chain";
 
 function Router() {
   return (
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/evidence" component={EvidenceManagement} />
       <Route path="/notion" component={NotionSync} />
+      <Route path="/search" component={Search} />
+      <Route path="/chain" component={Chain} />
       <Route component={NotFound} />
     </Switch>
   );
