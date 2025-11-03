@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Scale, Home, FileText, Search, Link as LinkIcon, Database, Zap } from "lucide-react";
+import { Scale, Home, FileText, Search, Link as LinkIcon, Database } from "lucide-react";
 
 export default function Navigation() {
   const [location] = useLocation();

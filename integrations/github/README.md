@@ -11,17 +11,7 @@ Set the following secrets via `wrangler secret put` or your preferred mechanism:
 - `GITHUB_PRIVATE_KEY_PEM`
 - `CHITTY_TENANT_SIGNING_KEY`
 
-Optional plain variables:
-
-- `INSTALLATION_RESOLVER_URL` (defaults to `https://api.chitty.cc/integrations/github/installations/resolve`)
-
-## Storage bindings
-
-Bind Cloudflare KV namespaces when available:
-
-- `TOKEN_CACHE` – caches installation access tokens until 60 seconds before expiry.
-- `DELIVERY_CACHE` – deduplicates webhook deliveries for 1 hour.
-- `INSTALLATION_CACHE` – memoizes installation → tenant mappings returned by the resolver.
+Optional: bind a `TOKEN_CACHE` KV namespace to cache installation access tokens.
 
 ## Endpoints
 

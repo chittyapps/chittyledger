@@ -6,9 +6,6 @@ export interface Env {
   GITHUB_PRIVATE_KEY_PEM: string
   CHITTY_TENANT_SIGNING_KEY: string
   TOKEN_CACHE?: KVNamespace
-  DELIVERY_CACHE?: KVNamespace
-  INSTALLATION_CACHE?: KVNamespace
-  INSTALLATION_RESOLVER_URL?: string
 }
 
 const app = new Hono<{ Bindings: Env }>()
@@ -19,64 +16,28 @@ app.post('/integrations/github/webhook', async c => {
   const deliveryId = c.req.header('X-GitHub-Delivery') ?? 'unknown'
   const event = c.req.header('X-GitHub-Event') ?? 'unknown'
 
-  if (!sig) {
-    return c.text('missing signature', 400)
-  }
-
   const body = await c.req.text()
   const valid = await verifyHmac256(body, secret, sig)
   if (!valid) {
     return c.text('sig mismatch', 401)
   }
 
-  let payload: GitHubWebhookPayload
-  try {
-    payload = JSON.parse(body) as GitHubWebhookPayload
-  } catch {
-    return c.text('invalid json', 400)
-  }
-
-  try {
-    if (deliveryId !== 'unknown') {
-      await ensureFreshDelivery(c.env, deliveryId)
-    }
-  } catch (error) {
-    if (error instanceof DuplicateDeliveryError) {
-      return c.text('duplicate delivery', 202)
-    }
-    console.error('github.delivery', serializeError(error))
-    return c.text('delivery guard error', 500)
-  }
-
-  const installationId = payload.installation?.id
+  const payload = JSON.parse(body)
+  const installationId: number | undefined = payload.installation?.id
   if (!installationId) {
     return c.text('no installation', 202)
   }
 
-  let tenantId: string
-  try {
-    tenantId = await mapInstallationToTenant(installationId, payload, c.env)
-  } catch (error) {
-    console.error('github.resolve', serializeError(error))
-    return c.text('tenant mapping error', 500)
-  }
+  const tenantId = await mapInstallationToTenant(installationId)
 
-  try {
-    await dispatchToMCP(
-      {
-        tenantId,
-        event,
-        deliveryId,
-        payload,
-      },
-      c.env,
-    )
-  } catch (error) {
-    console.error('github.dispatch', serializeError(error))
-    return c.text('dispatch failure', 502)
-  }
+  await dispatchToMCP({
+    tenantId,
+    event,
+    deliveryId,
+    payload,
+  })
 
-  return c.json({ ok: true })
+  return c.text('ok')
 })
 
 app.get('/integrations/github/check', c => {
@@ -309,218 +270,22 @@ export async function concludeCheckRun(
   }
 }
 
-async function dispatchToMCP(
-  input: {
-    tenantId: string
-    event: string
-    deliveryId: string
-    payload: unknown
-  },
-  env: Env,
-) {
-  const body = JSON.stringify(input)
-  const timestamp = new Date().toISOString()
-  const signature = await hmacHex(env.CHITTY_TENANT_SIGNING_KEY, `${timestamp}.${body}`)
-
-  const response = await fetch('https://mcp.chitty.cc/tools/github.event.dispatch', {
+async function dispatchToMCP(input: {
+  tenantId: string
+  event: string
+  deliveryId: string
+  payload: unknown
+}) {
+  await fetch('https://mcp.chitty.cc/tools/github.event.dispatch', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Chitty-Tenant': input.tenantId,
-      'X-Chitty-Timestamp': timestamp,
-      'X-Chitty-Signature': signature,
     },
-    body,
+    body: JSON.stringify(input),
   })
-
-  if (!response.ok && response.status !== 202) {
-    throw new Error(`mcp ${response.status}`)
-  }
 }
 
-async function mapInstallationToTenant(installationId: number, payload: GitHubWebhookPayload, env: Env) {
-  const cacheKey = `installation:${installationId}`
-  const cached = await env.INSTALLATION_CACHE?.get(cacheKey)
-  if (cached) {
-    try {
-      const record = JSON.parse(cached) as InstallationMapping
-      if (record.tenantId) {
-        return record.tenantId
-      }
-    } catch {
-      // fall through to resolver
-    }
-  }
-
-  const resolverUrl = env.INSTALLATION_RESOLVER_URL ?? 'https://api.chitty.cc/integrations/github/installations/resolve'
-  const snapshot = buildInstallationSnapshot(installationId, payload)
-  const body = JSON.stringify(snapshot)
-  const timestamp = new Date().toISOString()
-  const signature = await hmacHex(env.CHITTY_TENANT_SIGNING_KEY, `${timestamp}.${body}`)
-
-  const response = await fetch(resolverUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Chitty-Timestamp': timestamp,
-      'X-Chitty-Signature': signature,
-    },
-    body,
-  })
-
-  if (!response.ok) {
-    throw new Error(`installation-resolve ${response.status}`)
-  }
-
-  const data = (await response.json()) as InstallationResolverResponse
-  if (!data?.tenant_id) {
-    throw new Error('installation-resolve missing tenant_id')
-  }
-
-  const record: InstallationMapping = {
-    tenantId: data.tenant_id,
-    cachedAt: new Date().toISOString(),
-  }
-  await env.INSTALLATION_CACHE?.put(cacheKey, JSON.stringify(record), { expirationTtl: 60 * 60 })
-
-  return data.tenant_id
-}
-
-async function ensureFreshDelivery(env: Env, deliveryId: string) {
-  if (!env.DELIVERY_CACHE) {
-    return
-  }
-
-  const cacheKey = `delivery:${deliveryId}`
-  const seen = await env.DELIVERY_CACHE.get(cacheKey)
-  if (seen) {
-    throw new DuplicateDeliveryError(deliveryId)
-  }
-
-  await env.DELIVERY_CACHE.put(cacheKey, '1', { expirationTtl: 60 * 60 })
-}
-
-class DuplicateDeliveryError extends Error {
-  constructor(readonly deliveryId: string) {
-    super(`duplicate delivery ${deliveryId}`)
-  }
-}
-
-function serializeError(error: unknown) {
-  if (error instanceof Error) {
-    return { name: error.name, message: error.message }
-  }
-  return { message: String(error) }
-}
-
-async function hmacHex(key: string, msg: string) {
-  const bytes = await hmacSha256(key, msg)
-  return bytesToHex(bytes)
-}
-
-function bytesToHex(bytes: Uint8Array) {
-  let hex = ''
-  for (let i = 0; i < bytes.length; i++) {
-    hex += bytes[i].toString(16).padStart(2, '0')
-  }
-  return hex
-}
-
-type GitHubWebhookPayload = {
-  installation?: {
-    id: number
-    account?: {
-      id?: number
-      login?: string
-      type?: string
-    }
-    repository_selection?: string
-  }
-  repository?: {
-    id: number
-    name: string
-    full_name: string
-  }
-  repositories?: Array<{
-    id: number
-    name: string
-    full_name: string
-  }>
-  [key: string]: unknown
-}
-
-type InstallationResolverResponse = {
-  tenant_id: string
-}
-
-type InstallationMapping = {
-  tenantId: string
-  cachedAt: string
-}
-
-type InstallationSnapshot = {
-  installation_id: number
-  account_login?: string
-  account_id?: number
-  account_type?: string
-  selected_repositories?: string[]
-  repository?: {
-    id: number
-    name: string
-    full_name: string
-  }
-  repositories?: Array<{
-    id: number
-    name: string
-    full_name: string
-  }>
-}
-
-function buildInstallationSnapshot(installationId: number, payload: GitHubWebhookPayload): InstallationSnapshot {
-  const account = payload.installation?.account
-  const selectedRepositories = extractSelectedRepositoryNames(payload)
-  const repositories = payload.repositories?.map(repo => ({
-    id: repo.id,
-    name: repo.name,
-    full_name: repo.full_name,
-  }))
-
-  const snapshot: InstallationSnapshot = {
-    installation_id: installationId,
-  }
-
-  if (account?.login) {
-    snapshot.account_login = account.login
-  }
-  if (typeof account?.id === 'number') {
-    snapshot.account_id = account.id
-  }
-  if (account?.type) {
-    snapshot.account_type = account.type
-  }
-  if (selectedRepositories.length > 0) {
-    snapshot.selected_repositories = selectedRepositories
-  }
-  if (payload.repository) {
-    snapshot.repository = {
-      id: payload.repository.id,
-      name: payload.repository.name,
-      full_name: payload.repository.full_name,
-    }
-  }
-  if (repositories && repositories.length > 0) {
-    snapshot.repositories = repositories
-  }
-
-  return snapshot
-}
-
-function extractSelectedRepositoryNames(payload: GitHubWebhookPayload) {
-  const selection = payload.installation?.repository_selection
-  if (selection !== 'selected') {
-    return []
-  }
-
-  const repositories = payload.repositories ?? []
-  return repositories.map(repo => repo.full_name)
+async function mapInstallationToTenant(installationId: number) {
+  return `tenant:${installationId}`
 }
